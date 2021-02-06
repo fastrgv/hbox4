@@ -42,7 +42,7 @@ indicates using the defaults, i.e. 7.5Gb memory and fastest solution.
 
 There are many puzzles this algorithm will not solve due to memory limits, so the embedded memory limiter will exit gracefully when memory usage exceeds the preset limit. 
 
-Finally, if you don't want to wait for the solver to run out of memory, you must <ctrl>-c out of it to quit immediately.
+Finally, if you don't want to wait for the solver to finish, you can <ctrl>-c out of it to quit immediately.
 
 
 ## Algorithm Used

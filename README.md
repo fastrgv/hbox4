@@ -55,10 +55,10 @@ Self balancing splaytrees are used to test whether a given configuration was see
 
 The 4 priority measures were adapted from the "Festival" algorithm description, but simplified to allow rapid local evaluations:
 
-* pri1: Nboxes - NboxesOnGoals		0 means all boxes on goals
-* pri2: Ncorrals - 1						0 means only 1 corral, i.e. pusher is free to roam
-* pri3: NblockedRooms					0 means no boxes block openings
-* pri4: NblockedBoxes					0 means all boxes accessible to pusher
+* pri1: Nboxes - NboxesOnGoals  .................0 means all boxes on goals
+* pri2: Ncorrals - 1						.................0 means only 1 corral, i.e. pusher is free to roam
+* pri3: NblockedRooms					  .................0 means no boxes block openings
+* pri4: NblockedBoxes					  .................0 means all boxes accessible to pusher
 
 These priority measures are typically small non-negative integers to be minimized. So it often occurs that there are many candidate nodes of the search-tree with the same measure. To help distinguish those that are more promising, a secondary measure is used that counts the total box-pulls to reach the current configuration, PLUS the Hungarian-Algorithm-based estimate of the remaining number of pulls.
 

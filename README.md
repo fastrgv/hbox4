@@ -6,7 +6,7 @@ https://github.com/fastrgv/hbox4/releases/download/v1.0.0/hbox7feb21.7z
 
 
 
-#hbox4 -- sokoban solver using Ada
+# hbox4 -- sokoban solver using Ada
 
 **ver 1.0.0 -- 07feb2021**
 

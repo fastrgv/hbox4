@@ -7,6 +7,7 @@ https://github.com/fastrgv/hbox4/releases/download/v1.0.1/hbox10feb21.7z
 
 
 
+
 # hbox4 -- sokoban solver using Ada
 
 **ver 1.0.1 -- 10feb2021**
@@ -69,9 +70,25 @@ The 4 priority measures were adapted from the "Festival" algorithm description, 
 * pri3: NblockedRooms			...............0 means no boxes block openings
 * pri4: NblockedBoxes			...............0 means all boxes accessible to pusher
 
-These priority measures are typically small non-negative integers to be minimized. So it often occurs that there are many candidate nodes of the search-tree with the same measure. To help distinguish those that are more promising, a secondary measure is used that counts the total box-pulls to reach the current configuration, PLUS the Hungarian-Algorithm-based estimate of the remaining number of pulls. 
+These 4[primary] priority measures are typically small non-negative integers to be minimized. So it often occurs that there are many candidate nodes of the search-tree with the same measure. To help distinguish those that are more promising, a secondary measure is used that counts the total box-pulls to reach the current configuration, PLUS the Hungarian-Algorithm-based estimate of the remaining number of pulls. 
 
-Finally, the round robin regimen, that includes all 4 measures, is most effective in the beginning when there are typically blocked rooms, and many corrals. In the later stages, 3 priority measures are dropped to use only #1 because, once again, there may typically be blocked rooms and corrals that must be allowed near endgame. Recall that we are working backwards. 
+Finally, the round robin regimen that includes all 4 measures eventually drops the last 3 measures sometime before the endgame since corrals and blocked rooms must be permitted at the end of the reverse game, i.e. near the beginning of a forward game, and because the evaluation of the measures is costly.
+
+### Additional algorithmic details
+
+A nodal configuration description consists of the box layout, the upperleft corner of the puller-corral, as well as the total box pulls, the hungarian estimate of the future box pulls, and the 4 [primary] priority measures.
+
+Conceptually, the Splaytree Priority Queue {frontier} contains 4 independent queues, each ordered by one of the 4 priority measures mentioned above. So if the round-robin parameter is K in {0,1,2,3}, we greedily pop the leading candidate node off of the front of queue #K, thereby deleting it from {frontier}.
+
+So, in this SingleStepBoxSearch the initial configuration is read, evaluated and pushed into the {frontier} queue. But goal and boxes are interchanged because this is a backward search using a "puller" rather than a "pusher".
+
+So here begins the main loop:-------------------------------------------
+
+Choose "K", and pop the Kth queue, which removes that particular configuration from all 4 queues in {frontier}. This configuration is tested to see whether a solution has been reached. If not, it is inserted into the {explored} splaytree, which has no queue structures attached; it is only for rapid random retrieval in case we find a solution and need to reconstruct our path. 
+
+For this current configuration we simply cycle through each [unsorted] box and try to move it one step in each direction. If the move is successful, its 4 priority measures are evaluated and it is enqueued into {frontier}. This involves a splatree insertion and 4 priority-queue insertions that each maintain a separate ordering. (It was fairly tricky to get these priority-queue operations to be efficient enough for use in a sokoban solver.)
+
+End of main loop.------------------------------------------------------
 
 
 ## What's so great about this app?
@@ -100,6 +117,8 @@ This fully functional implementation of the Hungarian algorithm provides valid, 
 * consistent[monotone] means: h(x,g) <= actualCost(x,y)+h(y,g)
 
 Note that consistent => admissible assuming h(g,g)=0.
+
+One may choose to omit the Hungarian estimator so that the secondary [tie-breaking] priority measure then becomes simply the total box moves used to arrive at a given configuration.
 
 
 ### Simplicity & Generality
@@ -152,4 +171,5 @@ at <http://www.gnu.org/licenses/>.
 keywords:
 hungarian, ada, munkres, kuhn, kuhn-munkres,
 puzzle, sokoban, solver
+
 

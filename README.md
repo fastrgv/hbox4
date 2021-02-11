@@ -84,7 +84,9 @@ So, in this SingleStepBoxSearch the initial configuration is read, evaluated and
 
 So here begins the main loop:-------------------------------------------
 
-Choose "K", and pop the Kth queue, which removes that particular configuration from all 4 queues in {frontier}. This configuration is tested to see whether a solution has been reached. If not, it is inserted into the {explored} splaytree, which has no queue structures attached; it is only for rapid random retrieval in case we find a solution and need to reconstruct our path. 
+Choose "K", and pop the frontrunner off Kth queue and look at its nodal information to retrieve the hashkey. This key allows direct access via the splaytree structure that, in turn allows direct removal of the node from the splaytree and the other 3 PriQueues. Thusly, the removals from the other 3 PriQueues do not require any time consuming list-traversals.
+
+This removed configuration is then tested to see whether a solution has been reached. If not, it is inserted into the {explored} splaytree, which has no queue structures attached. The splaytree allows rapid insertion and rapid random retrieval in case we find a solution and need to reconstruct our path. 
 
 For this current configuration we simply cycle through each [unsorted] box and try to move it one step in each direction. If the move is successful, its 4 priority measures are evaluated and it is enqueued into {frontier}. This involves a splatree insertion and 4 priority-queue insertions that each maintain a separate ordering. (It was fairly tricky to get these priority-queue operations to be efficient enough for use in a sokoban solver.)
 
@@ -101,11 +103,13 @@ This is only a moderately capable sokoban solver (solving 32 of the original 90)
 
 * demonstrates the considerable power of the Hungarian Algorithm.
 
+* easily buildable on Windows, OSX, and Linux using AdaCore's GNAT compiler.
+
 It also adds further support to the effectiveness of the design choices made in the Festival solver that proposed these 4 "orthogonal" heuristic measures or, so called "features".
 
 
 ### SplayTree-Priority-Queue
-The splaytree [self-balancing-binary-tree] based priority queues allow unique hash keys to be inserted and found quickly, with 4 embedded priority queues that allows efficient insertions, access, and deletion from the heads [popping]. The hash keys uniquely identify box-layouts at each saved node, to avoid duplicates. The 4 priority queue orderings allow primary and secondary (tie-breaker) priority measures.
+The splaytree [self-balancing-binary-tree] based priority queues allow unique hash keys to be inserted and found quickly, with 4 embedded priority queues that allows efficient insertions, access, and deletion from the heads [popping]. The hash keys uniquely identify pusher & box-layouts at each saved node, to avoid duplicates. The 4 priority queue orderings allow primary and secondary (tie-breaker) priority measures. As mentioned above, the structure also allows rapid, direct access deletions given the hashkey.
 
 ### Dynamic Programming [flood-fill]
 Dynamic programming allows efficient determination of box-valid locations and the feasibility and cost of traversing between two locations. This information is used to feed into the Hungarian Algorithm.

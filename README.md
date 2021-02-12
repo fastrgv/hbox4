@@ -10,6 +10,14 @@ https://github.com/fastrgv/hbox4/releases/download/v1.0.1/hbox10feb21.7z
 
 # hbox4 -- sokoban solver using Ada
 
+
+**ver 1.0.2 -- 12feb2021**
+
+* Code cleanup;
+* Replaced splaylist with simpler splaytree;
+* Included both 32-bit and 64-bit Windows executables;
+
+
 **ver 1.0.1 -- 10feb2021**
 
 * added a 3rd solution method option to omit the Hungarian estimator.

@@ -117,7 +117,9 @@ It also adds further support to the effectiveness of the design choices made in 
 
 
 ### SplayTree-Priority-Queue
-The splaytree [self-balancing-binary-tree] based priority queues allow unique hash keys to be inserted, found & removed quickly, with 4 embedded priority queues that allows efficient insertions, access, and deletion, both from the heads [popping], and directly by key. The hash keys uniquely identify pusher & box-layouts at each saved node, to avoid duplicates. The 4 priority queue orderings allow primary and secondary (tie-breaker) priority measures. As mentioned above, the structure also allows rapid, direct access deletions given the hashkey.
+The splaytree [self-balancing-binary-tree] based priority queues allow unique hash keys to be inserted, found & removed quickly, with 4 embedded priority queues that allows efficient insertions, access, and deletion, both from the heads [popping], and directly by key. The hash keys uniquely identify pusher & box-layouts at each saved node, to avoid duplicates. The 4 priority queue orderings allow primary and secondary (tie-breaker) priority measures. As mentioned above, the structure also allows rapid, direct access deletions given the hashkey [O(log n)].
+
+The only expensive [O(n)] operation is finding the head of each queue. That involves a lexicographical search through a 2 dimensional array of pointers to find the first non-null pointer. All other queue operations are done in constant time [O(1)], i.e. independent of the number of queue entries.
 
 ### Dynamic Programming [flood-fill]
 Dynamic programming allows efficient determination of box-valid locations and the feasibility and cost of traversing between two locations. This information is used to feed into the Hungarian Algorithm.

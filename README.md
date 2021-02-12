@@ -165,7 +165,7 @@ In any case, I wish to expose this algorithm to public scrutiny, and allow anyon
 62 68 71 78 79 81 83 84 86 87
 
 hbox4 is extravagant with memory; all failures
-I have seen are due to shortage of memory.
+I have seen are due to shortage of memory, & lack of progress.
 
 
 

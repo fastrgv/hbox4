@@ -158,7 +158,7 @@ Disclaimer #3: even using the option for a more efficient solution, rather than 
 In any case, I wish to expose this algorithm to public scrutiny, and allow anyone with an interest, the chance to improve or extend this generic approach to the branch of artificial intelligence that addresses the formidable task of solving sokoban puzzles.
 
 
-## Xsokoban Levels Solved:
+## Xsokoban Levels Solved: see file xsok90times.txt
 
 1 2 3 4 5 6 7 8 9 12 15 17 29
 33 38 44 49 53 54 56 58 60

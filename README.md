@@ -11,6 +11,9 @@ https://github.com/fastrgv/hbox4/releases/download/v1.0.2/hbox12feb21.7z
 # hbox4 -- sokoban solver using Ada
 
 
+**ver 1.0.3 -- 18feb2021**
+* hbox4 now aborts when solution is not found after 10 minutes, to facilitate batch runs.
+
 **ver 1.0.2 -- 12feb2021**
 
 * Code cleanup;

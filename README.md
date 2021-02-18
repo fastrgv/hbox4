@@ -114,7 +114,7 @@ This is only a moderately capable sokoban solver (solving 32 of the original 90)
 
 * demonstrates the considerable power of the Hungarian Algorithm.
 
-* easily buildable on Windows, OSX, and Linux using AdaCore's GNAT compiler.
+* easily buildable on Windows, OSX, and Linux using AdaCore's free GNAT compiler.
 
 It also adds further support to the effectiveness of the design choices made in the Festival solver that proposed these 4 "orthogonal" heuristic measures or, so called "features".
 

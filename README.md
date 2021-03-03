@@ -8,27 +8,28 @@ https://github.com/fastrgv/hbox4/releases/download/v1.0.3/hbox_18feb21.7z
 
 
 
+
 # hbox4 -- sokoban solver using Ada
 
+**ver 1.0.4 -- 3mar2021**
+* Simplified, yet expanded the commandline parameters. Now allow naming an output file.
+* A linux executable [hbox4_gnu] is also included.
 
 **ver 1.0.3 -- 18feb2021**
 * hbox4 now aborts when solution is not found after 10 minutes, to facilitate batch runs.
 
 **ver 1.0.2 -- 12feb2021**
-
 * Code cleanup;
 * Replaced splaylist with simpler splaytree;
 * Included both 32-bit and 64-bit Windows executables;
 
-
 **ver 1.0.1 -- 10feb2021**
-
 * added a 3rd solution method option to omit the Hungarian estimator.
 * now deliver a Windows executable [runs fine under Wine]
 
 **ver 1.0.0 -- 08feb2021**
-
 * Initial release
+
 
 ## Description
 
@@ -36,28 +37,29 @@ This is a commandline-terminal sokoban solver written in Ada. It is "generic" in
 
 ## Usage
 
-Sokoban puzzles typically come in files containing groups of puzzles, so the user interface assumes that you provide a file-name, and 2 integers representing the total number of puzzles in the file, and the number of the puzzle to be solved. The solver name is "hbox4".
+Sokoban puzzles typically come in files containing groups of puzzles, so the user interface assumes that you provide a file-name, and 1 integer representing the number of the puzzle to be solved. The solver name is "hbox4".
 
-EG: hbox4 games/Sladkey.sok 50 22
+EG: hbox4 games/Sladkey.sok 22
 
 is the command to solve level 22 from the file "Sladkey.sok". The solution is written as a long string in the terminal window at the end of processing. Of course it could be redirected to a file thusly:
 
-EG: hbox4 games/Sladkey.sok 50 22 > soln.txt
+EG: hbox4 games/Sladkey.sok 22 > soln.txt
 
 -------------------------------------------------------------
-In addition to the 3 mandatory commandline parameters discussed above, there are 2 more optional ones:
+In addition to the 2 mandatory commandline parameters discussed above, there are 3 more optional ones:
 
-* (4) [float] MaxGb memory to use, with a default of 7.5 Gb.
-* (5) [int] Solution method: 
+* (3) [float] MaxGb memory to use, with a default of 7.5 Gb.
+* (4) [int] Solution method: 
 	* 0 (default) quickest solution
 	* 1 more efficient solution [the goal, not always the reality]
 	* 2 No Hungarian Estimator: generally more efficient solutions, sometimes faster.
+* (5) [string] OutputFileName
 
-EG: hbox4 games/Sladkey.sok 50 22 6.5 1
+EG: hbox4 games/Sladkey.sok 22 6.5 1 sladkey22.txt
 
-indicates using no more than 6.5 Gb of memory and the efficient solution method. But note that the solutions are not always efficient. This name merely refers to certain algorithmic choices within the solver which generally tend to produce solutions with fewer moves.
+indicates using no more than 6.5 Gb of memory and the efficient! solution method AND to write the output to a file in the current directory named "sladkey22.txt". !But note that the solutions are not always efficient. This name merely refers to certain algorithmic choices within the solver which generally tend to produce solutions with fewer moves.
 
-EG: hbox4 games/Sladkey.sok 50 22
+EG: hbox4 games/Sladkey.sok 22
 
 indicates using the defaults, i.e. 7.5Gb memory and fastest solution.
 
@@ -81,6 +83,8 @@ The 4 priority measures were adapted from the "Festival" algorithm description, 
 * pri3: NblockedRooms			...............0 means no boxes block openings
 * pri4: NblockedBoxes			...............0 means all boxes accessible to pusher
 
+Note that priority measure #1 counts a box as being on a goal only if it lies on its Hungarian-assigned goal, except when the non-Hungarian solution method is used.
+
 These 4[primary] priority measures are typically small non-negative integers to be minimized. So it often occurs that there are many candidate nodes of the search-tree with the same measure. To help distinguish those that are more promising, a secondary measure is used that counts the total box-pulls to reach the current configuration, PLUS the Hungarian-Algorithm-based estimate of the remaining number of pulls. 
 
 Finally, the round robin regimen that includes all 4 measures eventually drops the last 3 measures sometime before the endgame since corrals and blocked rooms must be permitted at the end of the reverse game, i.e. near the beginning of a forward game, and because the evaluation of the measures is costly.
@@ -102,6 +106,8 @@ This removed configuration is then tested to see whether a solution has been rea
 For this current configuration we simply cycle through each [unsorted] box and try to move it one step in each direction. If the move is successful, its 4 priority measures are evaluated and it is enqueued into {frontier}. This involves a splatree insertion and 4 priority-queue insertions that each maintain a separate ordering. (It was fairly tricky to get these priority-queue operations to be efficient enough for use in a sokoban solver.)
 
 End of main loop.------------------------------------------------------
+
+Addendum: after exchanging emails with Yaron Shoham, author of Festival, I have come to believe that Pri#4=NblockeBoxes is not quite "orthogonal" to Pri#3=NblockedRooms, meaning that #4 may occasionally enhance the effectiveness of #3 (and in fact, seems to). This would also imply that #4 could be omitted, as Yaron has proposed.
 
 
 ## What's so great about this app?
@@ -161,16 +167,14 @@ Disclaimer #3: even using the option for a more efficient solution, rather than 
 In any case, I wish to expose this algorithm to public scrutiny, and allow anyone with an interest, the chance to improve or extend this generic approach to the branch of artificial intelligence that addresses the formidable task of solving sokoban puzzles.
 
 
-## Xsokoban Levels Solved: see file xsok90times.txt
+## Xsokoban Levels Solved:
 
-1 2 3 4 5 6 7 8 9 12 15 17 18
-29 33 37 38 44 49 53 54 56 57 59
+1 2 3 4 5 6 7 8 9 12 15 17 18 
+29 33 37 38 44 49 53 54 56 57 59 
 60 64 68 71 78 79 81 82 83 84 86 87
 
 hbox4 is extravagant with memory; all failures
 I have seen are due to shortage of memory, & lack of progress.
-
-
 
 --------------------------
 ## License:
@@ -198,5 +202,4 @@ at <http://www.gnu.org/licenses/>.
 keywords:
 hungarian, ada, munkres, kuhn, kuhn-munkres,
 puzzle, sokoban, solver
-
 

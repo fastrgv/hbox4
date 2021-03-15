@@ -33,6 +33,9 @@ https://github.com/fastrgv/hbox4/releases/download/v1.0.4/hbx3mar21.7z
 
 This is a commandline-terminal sokoban solver written in Ada. It is "generic" in the sense that it contains no domain specific strategies. It also provides a demonstration of the advantage in using the Hungarian Algorithm.
 
+The proper command to extract the archive and maintain the directory structure is "7z x filename".
+
+
 ## Usage
 
 Sokoban puzzles typically come in files containing groups of puzzles, so the user interface assumes that you provide a file-name, and 1 integer representing the number of the puzzle to be solved. The solver name is "hbox4".

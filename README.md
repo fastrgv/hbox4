@@ -14,33 +14,24 @@ Type "7z x filename.7z" to extract the archive.
 
 # hbox4 -- sokoban solver using Ada
 
-**ver 1.0.4 -- 3mar2021**
-* Simplified, yet expanded the commandline parameters. Now allow naming an output file.
-* A linux executable [hbox4_gnu] is also included.
-
-**ver 1.0.3 -- 18feb2021**
-* hbox4 now aborts when solution is not found after 10 minutes, to facilitate batch runs.
-
-**ver 1.0.2 -- 12feb2021**
-* Code cleanup;
-* Replaced splaylist with simpler splaytree;
-* Included both 32-bit and 64-bit Windows executables;
-
-**ver 1.0.1 -- 10feb2021**
-* added a 3rd solution method option to omit the Hungarian estimator.
-* now deliver a Windows executable [runs fine under Wine]
-
-**ver 1.0.0 -- 08feb2021**
-* Initial release
-
-
-
 
 ## Description
 
 This is a commandline-terminal sokoban solver written in Ada. It is "generic" in the sense that it contains no domain specific strategies. It also provides a demonstration of the advantage in using the Hungarian Algorithm.
 
-The proper command to extract the archive and maintain the directory structure is "7z x filename".
+-----------------------------------------------------------
+Featuring
+
+	* no installation
+	* no dependencies
+	* simply unzip in your Downloads directory, and run.
+-----------------------------------------------------------
+
+Pre-built executables are provided in 3 variants:
+
+	* hbox4.exe (Win64)
+	* hbox4_gnu (linux)
+	* hbox4_osx (Mac/OSX)
 
 
 ## Usage
@@ -128,9 +119,9 @@ This is only a moderately capable sokoban solver (solving 32 of the original 90)
 
 * demonstrates the considerable power of the Hungarian Algorithm.
 
-* easily buildable on Windows, OSX, and Linux using AdaCore's free GNAT compiler.
+* easily buildable on Windows, OSX, and Linux using free GNU Ada compiler.
 
-It also adds further support to the effectiveness of the design choices made in the Festival solver that proposed these 4 "orthogonal" heuristic measures or, so called "features".
+It also adds further proof of the effectiveness of the design choices made in the Festival solver that proposed these 4 "orthogonal" heuristic measures or, so called "features".
 
 
 ### SplayTree-Priority-Queue
@@ -184,6 +175,39 @@ In any case, I wish to expose this algorithm to public scrutiny, and allow anyon
 hbox4 is extravagant with memory; all failures
 I have seen are due to shortage of memory, & lack of progress.
 
+
+## Build Instructions:
+
+Three usable, pre-compiled binary executables are delivered (Windows/Linux/OSX). But if you choose to try to rebuild, you will need to install GNU-Ada. That is fairly simple on Linux systems, and somewhat more complex on OSX. But I won't be discussing those.
+
+Here, I shall discuss how to install on Windows. In the past, AdaCore provided the simplest way to install a free 64-bit compilation system on Windows. But that has recently been discontinued. So I will describe the installation of GNU Ada. For this application, we certainly need the full access to memory that a 64-bit system provides.
+
+To install 64-bit Gnu Ada on Windows, first install MSYS2 into the default location: 
+	c:\msys64 
+using the link:
+	https://www.msys2.org/
+
+Then, launch an msys2 window using msys2.exe. In that new window type:
+
+	pacman -S mingw-w64-x86_64-gcc
+	pacman -S mingw-w64-x86_64-gcc-ada
+
+after which you may exit the msys2 window.
+
+Now, back in your usual Windows command prompt, you may add:
+
+	PATH=c:\msys64\mingw64\bin;%PATH%
+
+to your path in order to make visible the Ada and C++
+compilers: gnatmake, g++, etc.
+
+Once GNU Ada is installed, use the windows scripts:
+	a) setpath64.bat
+	b) wcmp64.bat
+
+to rebuild.
+
+
 --------------------------
 ## License:
 
@@ -191,7 +215,7 @@ I have seen are due to shortage of memory, & lack of progress.
 This app is covered by the GNU GPL v3 as indicated in the sources:
 
 
-Copyright (C) 2021  <fastrgv@gmail.com>
+Copyright (C) 2022  <fastrgv@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -210,4 +234,32 @@ at <http://www.gnu.org/licenses/>.
 keywords:
 hungarian, ada, munkres, kuhn, kuhn-munkres,
 puzzle, sokoban, solver
+
+===================== update history ========================
+
+**ver 1.0.5 -- 22sep2022**
+
+* Moved source code into ./src/.
+* Moved build scripts into ./build/.
+* Converted to use 64-bit GNU Ada rather than defunct AdaCore compiler.
+
+
+**ver 1.0.4 -- 3mar2021**
+* Simplified, yet expanded the commandline parameters. Now allow naming an output file.
+* A linux executable [hbox4_gnu] is also included.
+
+**ver 1.0.3 -- 18feb2021**
+* hbox4 now aborts when solution is not found after 10 minutes, to facilitate batch runs.
+
+**ver 1.0.2 -- 12feb2021**
+* Code cleanup;
+* Replaced splaylist with simpler splaytree;
+* Included both 32-bit and 64-bit Windows executables;
+
+**ver 1.0.1 -- 10feb2021**
+* added a 3rd solution method option to omit the Hungarian estimator.
+* now deliver a Windows executable [runs fine under Wine]
+
+**ver 1.0.0 -- 08feb2021**
+* Initial release
 

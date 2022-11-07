@@ -12,7 +12,21 @@ Type "7z x filename.7z" to extract the archive.
 
 
 
+
+link: https://sourceforge.net/projects/hbox4/
+
 # hbox4 -- sokoban solver using Ada
+
+
+## What's new:
+
+**ver 1.0.6 -- 08nov2022**
+
+* Windows 64-bit build now uses simple-to-install GNU Ada compiler.
+* Enhanced algorithmic explanations.
+
+## See more change-history at end of file
+
 
 
 ## Description
@@ -32,6 +46,11 @@ Pre-built executables are provided in 3 variants:
 	* hbox4.exe (Win64)
 	* hbox4_gnu (linux)
 	* hbox4_osx (Mac/OSX)
+
+
+Note that this solver may be run from a thumb drive: Simply unzip onto a USB flash drive formatted to match your system, and run.
+
+
 
 
 ## Usage
@@ -69,13 +88,13 @@ Finally, if you don't want to wait for the solver to finish, you can (ctrl)-c ou
 
 ## Algorithm Used
 
-A multiple-heuristic, single-step box search, done in reverse, using four "orthogonal" priority measures [heuristics] in a round-robin sequence. The Hungarian Algorithm is used to match boxes with goals and to generate an estimate of future box moves to solution.
+A multiple-heuristic, single-step box search, done in **reverse**, using four "orthogonal" priority measures [heuristics] in a round-robin sequence. The Hungarian Algorithm is used to match boxes with goals and to generate an estimate of future box moves to solution.
 
 An article by Frank Takes shows advantages to working from a solved position backwards to the start position. This prevents box-deadlocks from taking up space in the search tree. Thusly, the formidable issue of deadlock avoidance is completely ignored. Likewise, the tricky issue of endgame goal-packing-order is sidestepped, as well.
 
 Self balancing splaytrees are used to test whether a given configuration was seen before. There are also 4 priority queues embedded into the splaytrees that provide distinct "views" of the data.
 
-The 4 priority measures were adapted from the "Festival" algorithm description, but simplified to allow rapid local evaluations:
+The 4 priority measures were adapted from the "Festival" algorithm description, but possibly simplified to allow rapid local evaluations:
 
 * pri1: Nboxes - NboxesOnGoals...............0 means all boxes on goals
 * pri2: Ncorrals - 1				...............0 means only 1 corral, i.e. pusher is free to roam
@@ -96,13 +115,13 @@ Conceptually, the Splaytree Priority Queue {frontier} contains 4 independent que
 
 So, in this SingleStepBoxSearch the initial configuration is read, evaluated and pushed into the {frontier} queue. But goal and boxes are interchanged because this is a backward search using a "puller" rather than a "pusher".
 
-So here begins the main loop:-------------------------------------------
+So here begins the description of the main loop:-------------------------------------------
 
 Choose "K", and pop the frontrunner off Kth queue and look at its nodal information to retrieve the hashkey. This key allows direct access via the splaytree structure that, in turn allows direct removal of the node from the splaytree and the other 3 PriQueues. Thusly, the removals from the other 3 PriQueues do not require any time consuming list-traversals.
 
 This removed configuration is then tested to see whether a solution has been reached. If not, it is inserted into the {explored} splaytree, which has no queue structures attached. The splaytree allows rapid insertion and rapid random retrieval in case we find a solution and need to reconstruct our path. 
 
-For this current configuration we simply cycle through each [unsorted] box and try to move it one step in each direction. If the move is successful, its 4 priority measures are evaluated and it is enqueued into {frontier}. This involves a splatree insertion and 4 priority-queue insertions that each maintain a separate ordering. (It was fairly tricky to get these priority-queue operations to be efficient enough for use in a sokoban solver.)
+For this current configuration we simply cycle through each [unsorted] box and try to move it one step in each direction. If the move is successful, its 4 priority measures are evaluated and it is enqueued into {frontier}. This involves a splatree insertion and 4 priority-queue insertions that each maintain a separate ordering. 
 
 End of main loop.------------------------------------------------------
 
@@ -111,23 +130,25 @@ Addendum: after exchanging emails with Yaron Shoham, author of Festival, I have 
 
 ## What's so great about this app?
 
-This is only a moderately capable sokoban solver (solving 32 of the original 90). What makes it interesting? In a world with extremely capable solvers like Sokolution and Festival, why look at this one? Why hunt with an algorithmic crossbow instead of a gun? Simplicity, elegance. Hbox4:
+This is only a moderately capable sokoban solver (solving 32 of the original 90). What makes it interesting? In a world with extremely capable solvers like Sokolution and Festival, why look at this one? Why hunt with an algorithmic crossbow instead of a gun? Simplicity & elegance. Hbox4:
 
 * contains no domain-specific specializations or strategies [other than the 4 priority measures]
 
 * uses algorithms and data structures of general interest and usefullness.
 
-* demonstrates the considerable power of the Hungarian Algorithm.
+* demonstrates the considerable power of the Hungarian Algorithm to help direct effort.
 
 * easily buildable on Windows, OSX, and Linux using free GNU Ada compiler.
 
-It also adds further proof of the effectiveness of the design choices made in the Festival solver that proposed these 4 "orthogonal" heuristic measures or, so called "features".
+It also adds further proof of the effectiveness of the design choices made in the Festival solver that proposed these 4 "orthogonal" heuristic measures, or so-called "features".
 
 
 ### SplayTree-Priority-Queue
 The splaytree [self-balancing-binary-tree] based priority queues allow unique hash keys to be inserted, found & removed quickly, with 4 embedded priority queues that allows efficient insertions, access, and deletion, both from the heads [popping], and directly by key. The hash keys uniquely identify pusher & box-layouts at each saved node, to avoid duplicates. The 4 priority queue orderings allow primary and secondary (tie-breaker) priority measures. As mentioned above, the structure also allows rapid, direct access deletions given the hashkey [O(log n)].
 
 The only expensive [O(n)] operation is finding the head of each queue. That involves a lexicographical search through a 2 dimensional array of pointers to find the first non-null pointer. All other queue operations are done in constant time [O(1)], i.e. independent of the number of queue entries.
+
+It was very difficult to get these priority-queue operations to be efficient enough for use in a sokoban solver. The speed of this quadruple-queue data structure and algorithm is really quite remarkable!
 
 ### Dynamic Programming [flood-fill]
 Dynamic programming allows efficient determination of box-valid locations and the feasibility and cost of traversing between two locations. This information is used to feed into the Hungarian Algorithm.
@@ -141,6 +162,11 @@ This fully functional implementation of the Hungarian algorithm provides valid, 
 Note that consistent => admissible assuming h(g,g)=0.
 
 One may choose to omit the Hungarian estimator so that the secondary [tie-breaking] priority measure then becomes simply the total box moves used to arrive at a given configuration.
+
+#### Note on the Hungarian Algorithm: 
+I have searched for a correct version online, but found none. I found several that "almost" worked but were all flawed, mainly, I think, due to the age and nature of the original algorithmic description. It was invented before computers were widely available, so was described in terms of hand computations, parts of which are quite confusing, possibly due to language ambiguities. [Kuhn, 1955]
+
+The algorithm used here was copied on 20sep18 from: https://users.cs.duke.edu/~brd/Teaching/Bio/asmb/current/Handouts/munkres.html and modified to correct some errors.
 
 
 ### Simplicity & Generality
@@ -178,34 +204,30 @@ I have seen are due to shortage of memory, & lack of progress.
 
 ## Build Instructions:
 
-Three usable, pre-compiled binary executables are delivered (Windows/Linux/OSX). But if you choose to try to rebuild, you will need to install GNU-Ada. That is fairly simple on Linux systems, and somewhat more complex on OSX. But I won't be discussing those.
+Three usable, pre-compiled binary executables are delivered (Windows/Linux/OSX). But if you choose to try to rebuild, you will need to install GNU-Ada. That is fairly simple on Linux systems, and somewhat more complex on OSX. One good source is:
 
-Here, I shall discuss how to install on Windows. In the past, AdaCore provided the simplest way to install a free 64-bit compilation system on Windows. But that has recently been discontinued. So I will describe the installation of GNU Ada. For this application, we certainly need the full access to memory that a 64-bit system provides.
+	https://github.com/alire-project/GNAT-FSF-builds/releases
 
-To install 64-bit Gnu Ada on Windows, first install MSYS2 into the default location: 
-	c:\msys64 
-using the link:
-	https://www.msys2.org/
+For Windows users, one needs to build a 64-bit executable to access all available memory.
+Please read the details in the file "gnuAdaOnWindows.txt".
 
-Then, launch an msys2 window using msys2.exe. In that new window type:
 
-	pacman -S mingw-w64-x86_64-gcc
-	pacman -S mingw-w64-x86_64-gcc-ada
+## Shameless Plug for my own Sokoban games:
 
-after which you may exit the msys2 window.
+This solver, and 2 others, is embedded "live" in my two games (Windows,linux,Osx):
 
-Now, back in your usual Windows command prompt, you may add:
+	* RufaSok (plain, with several skins)
+	* WorldCupSokerban (soccer-themed that uses "balls" shaped like the intersection of 2 cylinders)
 
-	PATH=c:\msys64\mingw64\bin;%PATH%
+To me "live" means that the solver can be invoked at any time and it attempts to solve, not the original state, but the current state of your sokoban puzzle. Using a keyboard key, it single steps toward a solution, but can be de-invoked at any time after it has gotten you out of a difficult situation, and you think you can complete the solution by yourself. That capability is invaluable to helping one to learn to manually solve sokoban puzzles.
 
-to your path in order to make visible the Ada and C++
-compilers: gnatmake, g++, etc.
+The embedded solvers are time limited. You can set the timeout, but the default is 10sec.
 
-Once GNU Ada is installed, use the windows scripts:
-	a) setpath64.bat
-	b) wcmp64.bat
+See:
 
-to rebuild.
+https://sourceforge.net/projects/rufassok/
+
+https://sourceforge.net/projects/worldcupsokerban/
 
 
 --------------------------
@@ -262,4 +284,6 @@ puzzle, sokoban, solver
 
 **ver 1.0.0 -- 08feb2021**
 * Initial release
+
+
 

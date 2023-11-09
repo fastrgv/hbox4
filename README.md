@@ -18,12 +18,26 @@ Type "7z x filename.7z" to extract the archive.
 
 
 
+
 link: https://sourceforge.net/projects/hbox4/
 
 # hbox4 -- sokoban solver using Ada
 
 
 ## What's new:
+
+
+**ver 1.1.0 -- 10nov2023**
+
+* Corrected the recalculation of priority when reaching the same configuration with fewer pulls (Hungarian methods only). This fix allowed the default method (#0) to solve 3 more puzzles from Xsokoban-90.
+* Corrected the non-hungarian method (#2) to [properly] use a simple boxes-on-goals count.
+* Added a 4th method that considers total moves, to produce solutions with less dithering. This method should be the new default but it's not, in order to be backwards compatible. But it is fast and removes the very embarrasing dithering one sees in [the default] method #0. It also solves 4 more puzzles from Xsokoban-90, bringing the total to 40.
+
+
+**ver 1.0.7 -- 31oct23**
+
+* Revised OSX build; does not use any Xcode.
+
 
 **ver 1.0.6 -- 08nov2022**
 
@@ -49,7 +63,7 @@ Featuring
 Pre-built executables are provided in 3 variants:
 
 	* hbox4.exe (Win64)
-	* hbox4_gnu (linux)
+	* hbox4 (linux)
 	* hbox4_osx (Mac/OSX)
 
 
@@ -72,10 +86,11 @@ EG: hbox4 games/Sladkey.sok 22 > soln.txt
 In addition to the 2 mandatory commandline parameters discussed above, there are 3 more optional ones:
 
 * (3) [float] MaxGb memory to use, with a default of 7.5 Gb.
-* (4) [int] Solution method: 
-	* 0 (default) quickest solution
+* (4) [int 0..3] Solution method:
+	* 0 (default) quickest solution [tries to minimize #pushes]
 	* 1 more efficient solution [the goal, not always the reality]
 	* 2 No Hungarian Estimator: generally more efficient solutions, sometimes faster.
+	* 3 Like method 0 but also prioritizes total-moves (to a lesser extent than #pushes).
 * (5) [string] OutputFileName
 
 EG: hbox4 games/Sladkey.sok 22 6.5 1 sladkey22.txt
@@ -108,7 +123,21 @@ The 4 priority measures were adapted from the "Festival" algorithm description, 
 
 Note that priority measure #1 counts a box as being on a goal only if it lies on its Hungarian-assigned goal, except when the non-Hungarian solution method is used.
 
-These 4[primary] priority measures are typically small non-negative integers to be minimized. So it often occurs that there are many candidate nodes of the search-tree with the same measure. To help distinguish those that are more promising, a secondary measure is used that counts the total box-pulls to reach the current configuration, PLUS the Hungarian-Algorithm-based estimate of the remaining number of pulls. 
+These 4[primary] priority measures are typically small non-negative integers to be minimized. So it often occurs that there are many candidate nodes of the search-tree with the same measure. 
+
+So to help distinguish those that are most promising, a secondary priority measure is used that counts the total box-pulls to reach the current configuration, **PLUS** the Hungarian-Algorithm-based estimate of the remaining number of pulls. I.E.
+
+* pri2 := pulls + HungEst
+
+which currently has a range limit of 0..600.
+
+-------------------------------------------------------------------------------
+#### skippable detail
+* In the newest (nov23) method #3, this secondary measure also considers total moves as 10% of cost; I.E.
+	* pri2 := 0.9(pulls+HungEst) + 0.1(moves/4)
+* where the arithmetic is simply to stay within the current range limits of 0..600. 
+* Note that #moves is typically on the order of 4 x #pulls; hence the magic number 4.
+------------------------------------------------------------------------------
 
 Finally, the round robin regimen that includes all 4 measures eventually drops the last 3 measures sometime before the endgame since corrals and blocked rooms must be permitted at the end of the reverse game, i.e. near the beginning of a forward game, and because the evaluation of the measures is costly.
 
@@ -135,7 +164,7 @@ Addendum: after exchanging emails with Yaron Shoham, author of Festival, I have 
 
 ## What's so great about this app?
 
-This is only a moderately capable sokoban solver (solving 32 of the original 90). What makes it interesting? In a world with extremely capable solvers like Sokolution and Festival, why look at this one? Why hunt with an algorithmic crossbow instead of a gun? Simplicity & elegance. Hbox4:
+This is only a moderately capable sokoban solver (solving 40 of the original 90). What makes it interesting? In a world with extremely capable solvers like Sokolution and Festival, why look at this one? Why hunt with an algorithmic crossbow instead of a gun? Simplicity & elegance. Hbox4:
 
 * contains no domain-specific specializations or strategies [other than the 4 priority measures]
 
@@ -200,8 +229,8 @@ In any case, I wish to expose this algorithm to public scrutiny, and allow anyon
 ## Xsokoban Levels Solved:
 
 1 2 3 4 5 6 7 8 9 12 15 17 18 
-29 33 37 38 44 49 53 54 56 57 59 
-60 64 68 71 78 79 81 82 83 84 86 87
+29 33 37 38 43 44 49 51 53 54 56 57 58 59 
+60 62 64 68 71 78 79 81 82 83 84 86 87
 
 hbox4 is extravagant with memory; all failures
 I have seen are due to shortage of memory, & lack of progress.
@@ -242,7 +271,7 @@ https://sourceforge.net/projects/worldcupsokerban/
 This app is covered by the GNU GPL v3 as indicated in the sources:
 
 
-Copyright (C) 2022  <fastrgv@gmail.com>
+Copyright (C) 2023  <fastrgv@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -273,7 +302,7 @@ puzzle, sokoban, solver
 
 **ver 1.0.4 -- 3mar2021**
 * Simplified, yet expanded the commandline parameters. Now allow naming an output file.
-* A linux executable [hbox4_gnu] is also included.
+* A linux executable [hbox4] is also included.
 
 **ver 1.0.3 -- 18feb2021**
 * hbox4 now aborts when solution is not found after 10 minutes, to facilitate batch runs.
@@ -289,6 +318,5 @@ puzzle, sokoban, solver
 
 **ver 1.0.0 -- 08feb2021**
 * Initial release
-
 
 

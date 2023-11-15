@@ -72,7 +72,7 @@ Featuring
 Pre-built executables are provided in 3 variants:
 
 	* hbox4.exe (Win64)
-	* hbox4 (linux)
+	* hbox4_gnu (linux)
 	* hbox4_osx (Mac/OSX)
 
 

@@ -19,7 +19,8 @@ Type "7z x filename.7z" to extract the archive.
 
 
 
-link: https://sourceforge.net/projects/hbox4/
+
+alternate link: https://sourceforge.net/projects/hbox4/
 
 # hbox4 -- sokoban solver using Ada
 
@@ -27,10 +28,18 @@ link: https://sourceforge.net/projects/hbox4/
 ## What's new:
 
 
+**ver 1.1.1 -- 15nov2023**
+
+* Added a 5th & 6th solution methods, for the sake of completeness. 
+* Now include consideration of puller-to-pullerGoal accessibility.
+* Improved method for determining "endgame", the point at which 3 measurands are dropped.
+* Please read "~/docs/changes15nov23.txt" for details.
+
+
 **ver 1.1.0 -- 10nov2023**
 
 * Corrected the recalculation of priority when reaching the same configuration with fewer pulls (Hungarian methods only). This fix allowed the default method (#0) to solve 3 more puzzles from Xsokoban-90.
-* Corrected the non-hungarian method (#2) to [properly] use a simple boxes-on-goals count.
+* Corrected the non-hungarian method (#2) to [properly] use a simple boxes-on-goals count. Note that this change typcally reduced the speed & effectiveness of method 2. Recall that this method exists only to show the true advantage of using the Hungarian algorithm.
 * Added a 4th method that considers total moves, to produce solutions with less dithering. This method should be the new default but it's not, in order to be backwards compatible. But it is fast and removes the very embarrasing dithering one sees in [the default] method #0. It also solves 4 more puzzles from Xsokoban-90, bringing the total to 40.
 
 
@@ -89,8 +98,10 @@ In addition to the 2 mandatory commandline parameters discussed above, there are
 * (4) [int 0..3] Solution method:
 	* 0 (default) quickest solution [tries to minimize #pushes]
 	* 1 more efficient solution [the goal, not always the reality]
-	* 2 No Hungarian Estimator: generally more efficient solutions, sometimes faster.
-	* 3 Like method 0 but also prioritizes total-moves (to a lesser extent than #pushes).
+	* 2 No Hungarian Estimator: possibly more efficient solutions but typically much slower.
+	* 3 Like method 0 but also prioritizes total-moves ( 90% #pushes + 10% #moves ).
+	* 4 Like method 1 but also prioritizes total-moves.
+	* 5 Like method 2 but also prioritizes total-moves.
 * (5) [string] OutputFileName
 
 EG: hbox4 games/Sladkey.sok 22 6.5 1 sladkey22.txt
@@ -99,7 +110,7 @@ indicates using no more than 6.5 Gb of memory and the efficient! solution method
 
 EG: hbox4 games/Sladkey.sok 22
 
-indicates using the defaults, i.e. 7.5Gb memory and fastest solution.
+indicates using the defaults, i.e. 6.5Gb memory and fastest solution.
 
 There are many puzzles this algorithm will not solve due to memory limits, so the embedded memory limiter will exit gracefully when memory usage exceeds the preset limit. 
 
@@ -125,18 +136,20 @@ Note that priority measure #1 counts a box as being on a goal only if it lies on
 
 These 4[primary] priority measures are typically small non-negative integers to be minimized. So it often occurs that there are many candidate nodes of the search-tree with the same measure. 
 
-So to help distinguish those that are most promising, a secondary priority measure is used that counts the total box-pulls to reach the current configuration, **PLUS** the Hungarian-Algorithm-based estimate of the remaining number of pulls. I.E.
+So to help distinguish those that are more promising, a secondary priority measure [pri0] is used that counts the total box-pulls to reach the current configuration, **PLUS** the Hungarian-Algorithm-based estimate of the remaining number of pulls. I.E.
 
-* pri2 := pulls + HungEst
+* pri0 := pulls + HungEst
 
 which currently has a range limit of 0..600.
+
+As of late 2023, if the puller is blocked [by boxes] from reaching its goal, then one is added to "pri0" as a penalty.
 
 -------------------------------------------------------------------------------
 #### skippable detail
 * In the newest (nov23) method #3, this secondary measure also considers total moves as 10% of cost; I.E.
 	* pri2 := 0.9(pulls+HungEst) + 0.1(moves/4)
 * where the arithmetic is simply to stay within the current range limits of 0..600. 
-* Note that #moves is typically on the order of 4 x #pulls; hence the magic number 4.
+* Note that #moves is typically on the order of 4 x #pulls; hence the magic number 4 used to equilibrate measures.
 ------------------------------------------------------------------------------
 
 Finally, the round robin regimen that includes all 4 measures eventually drops the last 3 measures sometime before the endgame since corrals and blocked rooms must be permitted at the end of the reverse game, i.e. near the beginning of a forward game, and because the evaluation of the measures is costly.
@@ -226,7 +239,7 @@ Disclaimer #3: even using the option for a more efficient solution, rather than 
 In any case, I wish to expose this algorithm to public scrutiny, and allow anyone with an interest, the chance to improve or extend this generic approach to the branch of artificial intelligence that addresses the formidable task of solving sokoban puzzles.
 
 
-## Xsokoban Levels Solved:
+## Xsokoban Levels Solved (updated late 2023):
 
 1 2 3 4 5 6 7 8 9 12 15 17 18 
 29 33 37 38 43 44 49 51 53 54 56 57 58 59 

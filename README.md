@@ -2,7 +2,7 @@
 
 Here is a link to all source code and build files:
 
-https://github.com/fastrgv/hbox4/releases/download/v1.1.1/hb15nov23.7z
+https://github.com/fastrgv/hbox4/releases/download/v1.1.2/hb17nov23.7z
 
 Type "7z x filename.7z" to extract the archive.
 
@@ -20,8 +20,7 @@ Type "7z x filename.7z" to extract the archive.
 
 
 
-alternate 
-link: https://sourceforge.net/projects/hbox4/
+alternate link: https://sourceforge.net/projects/hbox4/
 
 # hbox4 -- sokoban solver using Ada
 

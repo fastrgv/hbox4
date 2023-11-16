@@ -20,12 +20,18 @@ Type "7z x filename.7z" to extract the archive.
 
 
 
-alternate link: https://sourceforge.net/projects/hbox4/
+alternate 
+link: https://sourceforge.net/projects/hbox4/
 
 # hbox4 -- sokoban solver using Ada
 
 
 ## What's new:
+
+
+**ver 1.1.2 -- 16nov2023**
+
+* Added an option to disable 3 of 4 priority measures (to enable a "baseline" method).
 
 
 **ver 1.1.1 -- 15nov2023**
@@ -102,6 +108,7 @@ In addition to the 2 mandatory commandline parameters discussed above, there are
 	* 3 Like method 0 but also prioritizes total-moves ( 90% #pushes + 10% #moves ).
 	* 4 Like method 1 but also prioritizes total-moves.
 	* 5 Like method 2 but also prioritizes total-moves.
+	* 10..15 triggers the "baseline" option for the above 6 methods (not for normal use).
 * (5) [string] OutputFileName
 
 EG: hbox4 games/Sladkey.sok 22 6.5 1 sladkey22.txt
@@ -111,6 +118,10 @@ indicates using no more than 6.5 Gb of memory and the efficient! solution method
 EG: hbox4 games/Sladkey.sok 22
 
 indicates using the defaults, i.e. 6.5Gb memory and fastest solution.
+
+EG: hbox4 games/Sladkey.sok 22 5.5 10
+
+indicates method 0 but using "baseline" single priority measure for comparison purposes.
 
 There are many puzzles this algorithm will not solve due to memory limits, so the embedded memory limiter will exit gracefully when memory usage exceeds the preset limit. 
 

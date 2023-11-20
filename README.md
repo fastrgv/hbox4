@@ -20,45 +20,24 @@ Type "7z x filename.7z" to extract the archive.
 
 
 
-alternate link: https://sourceforge.net/projects/hbox4/
+alternate 
+link: https://sourceforge.net/projects/hbox4/
 
 # hbox4 -- sokoban solver using Ada
 
 
-## What's new:
+#### What's new:
+
+**ver 1.1.3 -- 21nov2023**
+
+* Revised an internal list structure; changed a LIFO stack into a FIFO queue. This means that among equal-priority configurations, the first one found is processed first. This is a more typical design, but new to hbox4. The push/move efficiency of solutions are somewhat improved.
 
 
 **ver 1.1.2 -- 16nov2023**
 
 * Added an option to disable 3 of 4 priority measures (to enable a "baseline" method).
 
-
-**ver 1.1.1 -- 15nov2023**
-
-* Added a 5th & 6th solution methods, for the sake of completeness. 
-* Now include consideration of puller-to-pullerGoal accessibility.
-* Improved method for determining "endgame", the point at which 3 measurands are dropped.
-* Please read "~/docs/changes15nov23.txt" for details.
-
-
-**ver 1.1.0 -- 10nov2023**
-
-* Corrected the recalculation of priority when reaching the same configuration with fewer pulls (Hungarian methods only). This fix allowed the default method (#0) to solve 3 more puzzles from Xsokoban-90.
-* Corrected the non-hungarian method (#2) to [properly] use a simple boxes-on-goals count. Note that this change typcally reduced the speed & effectiveness of method 2. Recall that this method exists only to show the true advantage of using the Hungarian algorithm.
-* Added a 4th method that considers total moves, to produce solutions with less dithering. This method should be the new default but it's not, in order to be backwards compatible. But it is fast and removes the very embarrasing dithering one sees in [the default] method #0. It also solves 4 more puzzles from Xsokoban-90, bringing the total to 40.
-
-
-**ver 1.0.7 -- 31oct23**
-
-* Revised OSX build; does not use any Xcode.
-
-
-**ver 1.0.6 -- 08nov2022**
-
-* Windows 64-bit build now uses simple-to-install GNU Ada compiler.
-* Enhanced algorithmic explanations.
-
-## See more change-history at end of file
+#### More change-history at end of this file
 
 
 
@@ -101,8 +80,8 @@ In addition to the 2 mandatory commandline parameters discussed above, there are
 
 * (3) [float] MaxGb memory to use, with a default of 7.5 Gb.
 * (4) [int 0..3] Solution method:
-	* 0 (default) quickest solution [tries to minimize #pushes]
-	* 1 more efficient solution [the goal, not always the reality]
+	* 0 (default) "quickest" solution [tries to minimize #pushes]
+	* 1 more "efficient" solution [the goal, not always the reality]
 	* 2 No Hungarian Estimator: possibly more efficient solutions but typically much slower.
 	* 3 Like method 0 but also prioritizes total-moves ( 90% #pushes + 10% #moves ).
 	* 4 Like method 1 but also prioritizes total-moves.
@@ -156,10 +135,10 @@ As of late 2023, if the puller is blocked [by boxes] from reaching its goal, the
 
 -------------------------------------------------------------------------------
 #### skippable detail
-* In the newest (nov23) method #3, this secondary measure also considers total moves as 10% of cost; I.E.
-	* pri2 := 0.9(pulls+HungEst) + 0.1(moves/4)
-* where the arithmetic is simply to stay within the current range limits of 0..600. 
-* Note that #moves is typically on the order of 4 x #pulls; hence the magic number 4 used to equilibrate measures.
+* The newest methods #[3,4,5], the secondary measure (pri0) also considers total moves as 10% of cost; I.E.
+	* pri0 := 0.9(pulls+HungEst) + 0.1(moves/4)
+* where the arithmetic is simply to stay within the current range limits of 0..700. 
+* Note that #moves is typically at least 4 x #pulls; hence the magic number 4 used to equilibrate measures.
 ------------------------------------------------------------------------------
 
 Finally, the round robin regimen that includes all 4 measures eventually drops the last 3 measures sometime before the endgame since corrals and blocked rooms must be permitted at the end of the reverse game, i.e. near the beginning of a forward game, and because the evaluation of the measures is costly.
@@ -251,9 +230,17 @@ In any case, I wish to expose this algorithm to public scrutiny, and allow anyon
 
 ## Xsokoban Levels Solved (updated late 2023):
 
-1 2 3 4 5 6 7 8 9 12 15 17 18 
-29 33 37 38 43 44 49 51 53 54 56 57 58 59 
-60 62 64 68 71 78 79 81 82 83 84 86 87
+  1  2  3  4  5  6  7  8  9 12 
+ 15 17 18 29 33 37 38 43 44 49
+ 51 53 54 56 57 58 59 60 64 68
+ 71 78 79 81 82 83 84 86 87
+
+for a current total count of 39 for hbox4.
+
+Hbox1 adds 3 to this total: 41, 62, 65...where
+hbox1 refers to the methods numbered {10,11,12,13,14,15}
+that use a single priority measure: BOG [boxes on goals]
+rather than 4.
 
 hbox4 is extravagant with memory; all failures
 I have seen are due to shortage of memory, & lack of progress.
@@ -271,12 +258,12 @@ Please read the details in the file "gnuAdaOnWindows.txt".
 
 ## Shameless Plug for my own Sokoban games:
 
-This solver, and 2 others, is embedded "live" in my two games (Windows,linux,Osx):
+This solver, and 2 others, is embedded "live" in my two games (for Windows,Osx,&Linux):
 
 	* RufaSok (plain, with several skins)
 	* WorldCupSokerban (soccer-themed that uses "balls" shaped like the intersection of 2 cylinders)
 
-To me "live" means that the solver can be invoked at any time and it attempts to solve, not the original state, but the current state of your sokoban puzzle. Using a keyboard key, it single steps toward a solution, but can be de-invoked at any time after it has gotten you out of a difficult situation, and you think you can complete the solution by yourself. That capability is invaluable to helping one to learn to manually solve sokoban puzzles.
+To me "live" means that the solver can be invoked at any time and it attempts to solve, not the original state, but the current state of your sokoban puzzle (whether or not it is too late). Using a keyboard key, it single steps toward a solution, but can be de-invoked at any time after it has gotten you out of a difficult situation, and you think you can complete the solution by yourself. That capability is invaluable to helping one to learn to manually solve sokoban puzzles.
 
 The embedded solvers are time limited. You can set the timeout, but the default is 10sec.
 
@@ -316,12 +303,28 @@ puzzle, sokoban, solver
 
 ===================== update history ========================
 
-**ver 1.0.5 -- 22sep2022**
+**ver 1.1.1 -- 15nov2023**
+* Added a 5th & 6th solution methods, for the sake of completeness. 
+* Now include consideration of puller-to-pullerGoal accessibility.
+* Improved method for determining "endgame", the point at which 3 measurands are dropped.
+* Please read "~/docs/changes15nov23.txt" for details.
 
+**ver 1.1.0 -- 10nov2023**
+* Corrected the recalculation of priority when reaching the same configuration with fewer pulls (Hungarian methods only). This fix allowed the default method (#0) to solve 3 more puzzles from Xsokoban-90.
+* Corrected the non-hungarian method (#2) to [properly] use a simple boxes-on-goals count. Note that this change typcally reduced the speed & effectiveness of method 2. Recall that this method exists only to show the true advantage of using the Hungarian algorithm.
+* Added a 4th method that considers total moves, to produce solutions with less dithering. This method should be the new default but it's not, in order to be backwards compatible. But it is fast and removes the very embarrasing dithering one sees in [the default] method #0. It also solves 4 more puzzles from Xsokoban-90, bringing the total to 40.
+
+**ver 1.0.7 -- 31oct23**
+* Revised OSX build; does not use any Xcode.
+
+**ver 1.0.6 -- 08nov2022**
+* Windows 64-bit build now uses simple-to-install GNU Ada compiler.
+* Enhanced algorithmic explanations.
+
+**ver 1.0.5 -- 22sep2022**
 * Moved source code into ./src/.
 * Moved build scripts into ./build/.
 * Converted to use 64-bit GNU Ada rather than defunct AdaCore compiler.
-
 
 **ver 1.0.4 -- 3mar2021**
 * Simplified, yet expanded the commandline parameters. Now allow naming an output file.

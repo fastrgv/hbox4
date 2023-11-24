@@ -28,6 +28,15 @@ link: https://sourceforge.net/projects/hbox4/
 
 #### What's new:
 
+
+**ver 1.1.4 -- 25nov2023**
+
+* Now use preprocessing to determine minimal valid and "live" box positions.
+* Extended box-count limitation from 24 to 32.
+* Began the rigorous enforcement of theoretical limitations: 32 boxes, 256 valid box positions.
+* Restructured data to better conserve memory usage without impacting runtimes.
+
+
 **ver 1.1.3 -- 21nov2023**
 
 * Revised an internal list structure; changed a LIFO stack into a FIFO queue. This means that among equal-priority configurations, the first one found is processed first. This is a more typical design, but new to hbox4. The push/move efficiency of solutions are somewhat improved.

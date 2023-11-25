@@ -21,6 +21,7 @@ Type "7z x filename.7z" to extract the archive.
 
 
 alternate 
+
 link: https://sourceforge.net/projects/hbox4/
 
 # hbox4 -- sokoban solver using Ada
@@ -35,16 +36,6 @@ link: https://sourceforge.net/projects/hbox4/
 * Extended box-count limitation from 24 to 32.
 * Began the rigorous enforcement of theoretical limitations: 32 boxes, 256 valid box positions.
 * Restructured data to better conserve memory usage without impacting runtimes.
-
-
-**ver 1.1.3 -- 21nov2023**
-
-* Revised an internal list structure; changed a LIFO stack into a FIFO queue. This means that among equal-priority configurations, the first one found is processed first. This is a more typical design, but new to hbox4. The push/move efficiency of solutions are somewhat improved.
-
-
-**ver 1.1.2 -- 16nov2023**
-
-* Added an option to disable 3 of 4 priority measures (to enable a "baseline" method).
 
 #### More change-history at end of this file
 
@@ -87,7 +78,7 @@ EG: hbox4 games/Sladkey.sok 22 > soln.txt
 -------------------------------------------------------------
 In addition to the 2 mandatory commandline parameters discussed above, there are 3 more optional ones:
 
-* (3) [float] MaxGb memory to use, with a default of 7.5 Gb.
+* (3) [float] MaxGb memory to use
 * (4) [int 0..3] Solution method:
 	* 0 (default) "quickest" solution [tries to minimize #pushes]
 	* 1 more "efficient" solution [the goal, not always the reality]
@@ -138,7 +129,7 @@ So to help distinguish those that are more promising, a secondary priority measu
 
 * pri0 := pulls + HungEst
 
-which currently has a range limit of 0..600.
+which currently has a range limit of 0..700.
 
 As of late 2023, if the puller is blocked [by boxes] from reaching its goal, then one is added to "pri0" as a penalty.
 
@@ -150,7 +141,7 @@ As of late 2023, if the puller is blocked [by boxes] from reaching its goal, the
 * Note that #moves is typically at least 4 x #pulls; hence the magic number 4 used to equilibrate measures.
 ------------------------------------------------------------------------------
 
-Finally, the round robin regimen that includes all 4 measures eventually drops the last 3 measures sometime before the endgame since corrals and blocked rooms must be permitted at the end of the reverse game, i.e. near the beginning of a forward game, and because the evaluation of the measures is costly.
+Finally, the round robin regimen that includes all 4 measures eventually drops the last 3 measures near the halfway point since corrals and blocked rooms must be permitted at the end of the reverse game, i.e. near the beginning of a forward game, and because the evaluation of the measures is costly.
 
 ### Additional algorithmic details
 
@@ -228,6 +219,8 @@ For the C++ programmer this Ada code is written in a transparent style and shoul
 
 ## Shortcomings
 
+Currently handles only 32 boxes or less.
+
 Disclaimer #1: the elegance lies in the algorithms, not the code.
 
 Disclaimer #2: No attempt at solution optimality is made. The goal in this solver is to find any solution. The 4 orthogonal "features" do not lend themselves to finding solutions with any type of optimality.
@@ -239,12 +232,12 @@ In any case, I wish to expose this algorithm to public scrutiny, and allow anyon
 
 ## Xsokoban Levels Solved (updated late 2023):
 
-  1  2  3  4  5  6  7  8  9 12 
- 15 17 18 29 33 37 38 43 44 49
- 51 53 54 56 57 58 59 60 64 68
- 71 78 79 81 82 83 84 86 87
+  1  2  3  4  5  6  7  9 12 15
+ 17 18 29 33 37 38 43 44 49 51
+ 53 54 56 57 58 59 60 64 68 71
+ 78 79 81 82 83 84 86 87
 
-for a current total count of 39 for hbox4.
+for a current total count of 38 for hbox4.
 
 Hbox1 adds 3 to this total: 41, 62, 65...where
 hbox1 refers to the methods numbered {10,11,12,13,14,15}
@@ -311,6 +304,12 @@ hungarian, ada, munkres, kuhn, kuhn-munkres,
 puzzle, sokoban, solver
 
 ===================== update history ========================
+
+**ver 1.1.3 -- 21nov2023**
+* Revised an internal list structure; changed a LIFO stack into a FIFO queue. This means that among equal-priority configurations, the first one found is processed first. This is a more typical design, but new to hbox4. The push/move efficiency of solutions are somewhat improved.
+
+**ver 1.1.2 -- 16nov2023**
+* Added an option to disable 3 of 4 priority measures (to enable a "baseline" method).
 
 **ver 1.1.1 -- 15nov2023**
 * Added a 5th & 6th solution methods, for the sake of completeness. 

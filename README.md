@@ -22,17 +22,26 @@ Type "7z x filename.7z" to extract the archive.
 
 alternate link: https://sourceforge.net/projects/hbox4/
 
+
+
 # hbox4 -- sokoban solver using Ada
 
 
 #### What's new:
 
 
+
+**ver 1.1.5 -- 1dec2023**
+
+* Reverted to older & faster splay queue implementation.
+* Revised /docs/xsok90times.txt (smaller average).
+
+
 **ver 1.1.4 -- 25nov2023**
 
 * Now use preprocessing to determine minimal valid and "live" box positions.
 * Extended box-count limitation from 24 to 32.
-* Began the rigorous enforcement of theoretical limitations: 32 boxes, 256 valid box positions.
+* Began the rigorous enforcement of theoretical limitations: 32 boxes, 256 live box positions.
 * Restructured data to better conserve memory usage without impacting runtimes.
 
 #### More change-history at end of this file
@@ -84,7 +93,7 @@ In addition to the 2 mandatory commandline parameters discussed above, there are
 	* 3 Like method 0 but also prioritizes total-moves ( 90% #pushes + 10% #moves ).
 	* 4 Like method 1 but also prioritizes total-moves.
 	* 5 Like method 2 but also prioritizes total-moves.
-	* 10..15 triggers the "baseline" option for the above 6 methods (not for normal use).
+	* 10..15 triggers the single priority hbox1 "baseline" option for the above 6 methods (not for normal use).
 * (5) [string] OutputFileName
 
 EG: hbox4 games/Sladkey.sok 22 6.5 1 sladkey22.txt
@@ -129,7 +138,7 @@ So to help distinguish those that are more promising, a secondary priority measu
 
 which currently has a range limit of 0..700.
 
-As of late 2023, if the puller is blocked [by boxes] from reaching its goal, then one is added to "pri0" as a penalty.
+If the puller is blocked [by boxes] from reaching its goal, then one is added to "pri0" as a penalty.
 
 -------------------------------------------------------------------------------
 #### skippable detail
@@ -139,7 +148,7 @@ As of late 2023, if the puller is blocked [by boxes] from reaching its goal, the
 * Note that #moves is typically at least 4 x #pulls; hence the magic number 4 used to equilibrate measures.
 ------------------------------------------------------------------------------
 
-Finally, the round robin regimen that includes all 4 measures eventually drops the last 3 measures near the halfway point since corrals and blocked rooms must be permitted at the end of the reverse game, i.e. near the beginning of a forward game, and because the evaluation of the measures is costly.
+Finally, the round robin regimen that includes all 4 measures eventually drops the last 3 measures somewhere beyond the halfway point since corrals and blocked rooms must be permitted at the end of the reverse game, i.e. near the beginning of a forward game, and because the evaluation of the measures is costly.
 
 ### Additional algorithmic details
 
@@ -200,7 +209,7 @@ One may choose to omit the Hungarian estimator so that the secondary [tie-breaki
 #### Note on the Hungarian Algorithm: 
 I have searched for a correct version online, but found none. I found several that "almost" worked but were all flawed, mainly, I think, due to the age and nature of the original algorithmic description. It was invented before computers were widely available, so was described in terms of hand computations, parts of which are quite confusing, possibly due to language ambiguities. [Kuhn, 1955]
 
-The algorithm used here was copied on 20sep18 from: https://users.cs.duke.edu/~brd/Teaching/Bio/asmb/current/Handouts/munkres.html and modified to correct some errors.
+The algorithm used here was copied on 20sep18 from: https://users.cs.duke.edu/~brd/Teaching/Bio/asmb/current/Handouts/munkres.html [now dead link] and modified to correct some errors.
 
 
 ### Simplicity & Generality
@@ -230,14 +239,14 @@ In any case, I wish to expose this algorithm to public scrutiny, and allow anyon
 
 ## Xsokoban Levels Solved (updated late 2023):
 
-  1  2  3  4  5  6  7  9 12 15
- 17 18 29 33 37 38 43 44 49 51
- 53 54 56 57 58 59 60 64 68 71
- 78 79 81 82 83 84 86 87
+  1  2  3  5  6  7  8  9 12 15 
+ 17 18 29 33 37 38 41 43 44 49 
+ 51 53 54 56 57 58 59 60 62 64 
+ 65 68 78 79 81 82 83 84 86 87
 
-for a current total count of 38 for hbox4.
+for a current total count of 40 for hbox4.
 
-Hbox1 adds 3 to this total: 41, 62, 65...where
+Hbox1 may add some to this total, where
 hbox1 refers to the methods numbered {10,11,12,13,14,15}
 that use a single priority measure: BOG [boxes on goals]
 rather than 4.
@@ -304,7 +313,7 @@ puzzle, sokoban, solver
 ===================== update history ========================
 
 **ver 1.1.3 -- 21nov2023**
-* Revised an internal list structure; changed a LIFO stack into a FIFO queue. This means that among equal-priority configurations, the first one found is processed first. This is a more typical design, but new to hbox4. The push/move efficiency of solutions are somewhat improved.
+* Revised an internal list structure; changed a LIFO stack into a FIFO queue. This means that among equal-priority configurations, the first one found is processed first. This is a more typical design, but new to hbox4. The push/move efficiency of solutions are somewhat improved (but not speed).
 
 **ver 1.1.2 -- 16nov2023**
 * Added an option to disable 3 of 4 priority measures (to enable a "baseline" method).

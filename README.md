@@ -20,15 +20,19 @@ Type "7z x filename.7z" to extract the archive.
 
 
 
-alternate link: https://sourceforge.net/projects/hbox4/
 
-
+Alternate download link: https://sourceforge.net/projects/hbox4/
 
 # hbox4 -- sokoban solver using Ada
 
 
 #### What's new:
 
+
+
+**ver 1.1.6 -- 5dec2023**
+
+* Added more tweaks for faster execution.
 
 
 **ver 1.1.5 -- 1dec2023**
@@ -143,12 +147,12 @@ If the puller is blocked [by boxes] from reaching its goal, then one is added to
 -------------------------------------------------------------------------------
 #### skippable detail
 * The newest methods #[3,4,5], the secondary measure (pri0) also considers total moves as 10% of cost; I.E.
-	* pri0 := 0.9(pulls+HungEst) + 0.1(moves/4)
+	* pri0 := 0.9(pulls+HungEst) + 0.1(moves/5)
 * where the arithmetic is simply to stay within the current range limits of 0..700. 
-* Note that #moves is typically at least 4 x #pulls; hence the magic number 4 used to equilibrate measures.
+* Note that #moves is typically about 5 x #pulls; hence the magic number 5 used to equilibrate measures.
 ------------------------------------------------------------------------------
 
-Finally, the round robin regimen that includes all 4 measures eventually drops the last 3 measures somewhere beyond the halfway point since corrals and blocked rooms must be permitted at the end of the reverse game, i.e. near the beginning of a forward game, and because the evaluation of the measures is costly.
+Finally, the round robin regimen that includes all 4 measures eventually drops the last 3 measures somewhere near the halfway point since corrals and blocked rooms must be permitted at the end of the reverse game, i.e. near the beginning of a forward game, and because the evaluation of the measures is costly.
 
 ### Additional algorithmic details
 
@@ -265,7 +269,7 @@ For Windows users, one needs to build a 64-bit executable to access all availabl
 Please read the details in the file "gnuAdaOnWindows.txt".
 
 
-## Shameless Plug for my own Sokoban games:
+## Shameless Plug for my own Sokoban game-platforms:
 
 This solver, and 2 others, is embedded "live" in my two games (for Windows,Osx,&Linux):
 

@@ -21,12 +21,23 @@ Type "7z x filename.7z" to extract the archive.
 
 
 
-Alternate download link: https://sourceforge.net/projects/hbox4/
 
-# hbox4 -- sokoban solver using Ada
+Alternate download link: https://sourceforge.net/projects/hbox5/
+
+# hbox5 -- sokoban solver using Ada
 
 
 #### What's new:
+
+
+
+**ver 1.1.8 -- 13dec2024**
+
+* Added a memory check to assure its availability: Windows, OSX, linux.
+* Enhanced portability of my linux build [by using an old compiler].
+* Delayed the endgame, thus giving more time for the full set of heuristics to be in play.
+* Added a 5th heuristic that generally improves performance; hence the name.
+* Bumped default timeout limit from 10 to 11 minutes; but, al always, (ctrl)-c quits at any time.
 
 
 **ver 1.1.7 -- 2jan2024**
@@ -70,9 +81,9 @@ Featuring
 
 Pre-built executables are provided in 3 variants:
 
-	* hbox4.exe (Win64)
-	* hbox4_gnu (linux)
-	* hbox4_osx (Mac/OSX)
+	* hbox5.exe (Win64)
+	* hbox5_gnu (linux)
+	* hbox5_osx (Mac/OSX)
 
 
 Note that this solver may be run from a thumb drive: Simply unzip onto a USB flash drive formatted to match your system, and run.
@@ -82,37 +93,39 @@ Note that this solver may be run from a thumb drive: Simply unzip onto a USB fla
 
 ## Usage
 
-Sokoban puzzles typically come in files containing groups of puzzles, so the user interface assumes that you provide a file-name, and 1 integer representing the number of the puzzle to be solved. The solver name is "hbox4".
+Sokoban puzzles typically come in files containing groups of puzzles, so the user interface assumes that you provide a file-name, and 1 integer representing the number of the puzzle to be solved. The solver name is "hbox5".
 
-EG: hbox4 games/Sladkey.sok 22
+EG: hbox5 games/Sladkey.sok 22
 
 is the command to solve level 22 from the file "Sladkey.sok". The solution is written as a long string in the terminal window at the end of processing. Of course it could be redirected to a file thusly:
 
-EG: hbox4 games/Sladkey.sok 22 > soln.txt
+EG: hbox5 games/Sladkey.sok 22 > soln.txt
 
 -------------------------------------------------------------
 In addition to the 2 mandatory commandline parameters discussed above, there are 3 more optional ones:
 
 * (3) [float] MaxGb memory to use
 * (4) [int 0..3] Solution method:
-	* 0 (default) "quickest" solution [tries to minimize #pushes]
-	* 1 more "efficient" solution [the goal, not always the reality]
-	* 2 No Hungarian Estimator: possibly more efficient solutions but typically much slower.
-	* 3 Like method 0 but also prioritizes total-moves ( 90% #pushes + 10% #moves ).
-	* 4 Like method 1 but also prioritizes total-moves.
-	* 5 Like method 2 but also prioritizes total-moves.
-	* 10..15 triggers the single priority hbox1 "baseline" option for the above 6 methods (not for normal use).
+	* 0 (default) "quickest" solution [a cfg updated only if #pushes is reduced]
+	* 1 move-reducing CFG-updates [a cfg updated even if #pushes is equal but #moves is reduced]
+	* 2 No Hungarian Estimator: possibly more move-efficient solutions but typically much slower.
+	* 3 Like method 0 but also penalizes total-moves [ p0= 0.9(p0) + 0.1(moves/5) ].
+	* 4 Like method 1 but also penalizes total-moves [ p0= 0.9(p0) + 0.1(moves/5) ].
+	* 5 Like method 2 but also penalizes total-moves [ p0= 0.9(p0) + 0.1(moves/5) ].
+
+	* 10..15 triggers the single priority hbox1 "baseline" option for the above 6 methods [not for normal use].
+
 * (5) [string] OutputFileName
 
-EG: hbox4 games/Sladkey.sok 22 6.5 1 sladkey22.txt
+EG: hbox5 games/Sladkey.sok 22 6.5 1 sladkey22.txt
 
 indicates using no more than 6.5 Gb of memory and the efficient! solution method AND to write the output to a file in the current directory named "sladkey22.txt". !But note that the solutions are not always efficient. This name merely refers to certain algorithmic choices within the solver which generally tend to produce solutions with fewer moves.
 
-EG: hbox4 games/Sladkey.sok 22
+EG: hbox5 games/Sladkey.sok 22
 
 indicates using the defaults, i.e. 6.5Gb memory and fastest solution.
 
-EG: hbox4 games/Sladkey.sok 22 5.5 10
+EG: hbox5 games/Sladkey.sok 22 5.5 10
 
 indicates method 0 but using "baseline" single priority measure for comparison purposes.
 
@@ -123,22 +136,24 @@ Finally, if you don't want to wait for the solver to finish, you can (ctrl)-c ou
 
 ## Algorithm Used
 
-A multiple-heuristic, single-step box search, done in **reverse**, using four "orthogonal" priority measures [heuristics] in a round-robin sequence. The Hungarian Algorithm is used to match boxes with goals and to generate an estimate of future box moves to solution.
+A multiple-heuristic, single-step box search, done in **reverse**, using five "orthogonal" priority measures [heuristics] in a round-robin sequence. The Hungarian Algorithm is used to match boxes with goals and to generate an estimate of future box moves to solution.
 
 An article by Frank Takes shows advantages to working from a solved position backwards to the start position. This prevents box-deadlocks from taking up space in the search tree. Thusly, the formidable issue of deadlock avoidance is completely ignored. Likewise, the tricky issue of endgame goal-packing-order is sidestepped, as well.
 
-Self balancing splaytrees are used to test whether a given configuration was seen before. There are also 4 priority queues embedded into the splaytrees that provide distinct "views" of the data.
+Self balancing splaytrees are used to test whether a given configuration was seen before. There are also 5 priority queues embedded into the splaytrees that provide distinct "views" of the data.
 
-The 4 priority measures were adapted from the "Festival" algorithm description, but possibly simplified to allow rapid local evaluations:
+The first 4 priority measures were adapted from the "Festival" algorithm description, but possibly simplified to allow rapid local evaluations:
 
 * pri1: Nboxes - NboxesOnGoals...............0 means all boxes on goals
 * pri2: Ncorrals - 1				...............0 means only 1 corral, i.e. pusher is free to roam
 * pri3: NblockedRooms			...............0 means no boxes block openings
 * pri4: NblockedBoxes			...............0 means all boxes accessible to pusher
 
+* pri5: Nfar						...............non-linearly drives most-distant boxes nearer their goals
+
 Note that priority measure #1 counts a box as being on a goal only if it lies on its Hungarian-assigned goal, except when the non-Hungarian solution method is used.
 
-These 4[primary] priority measures are typically small non-negative integers to be minimized. So it often occurs that there are many candidate nodes of the search-tree with the same measure. 
+These 5[primary] priority measures are typically small non-negative integers to be minimized. So it often occurs that there are many candidate nodes of the search-tree with the same measure. 
 
 So to help distinguish those that are more promising, a secondary priority measure [pri0] is used that counts the total box-pulls to reach the current configuration, **PLUS** the Hungarian-Algorithm-based estimate of the remaining number of pulls. I.E.
 
@@ -156,13 +171,13 @@ If the puller is blocked [by boxes] from reaching its goal, then one is added to
 * Note that #moves is typically about 5 x #pulls; hence the magic number 5 used to equilibrate measures.
 ------------------------------------------------------------------------------
 
-Finally, the round robin regimen that includes all 4 measures eventually drops the last 3 measures somewhere near the halfway point since corrals and blocked rooms must be permitted at the end of the reverse game, i.e. near the beginning of a forward game, and because the evaluation of the measures is costly.
+Finally, the round robin regimen that includes all 5 measures eventually drops the last 4 measures somewhere beyond the halfway point since corrals and blocked rooms must be permitted at the end of the reverse game, i.e. near the beginning of a forward game, and because the evaluation of the measures is costly.
 
 ### Additional algorithmic details
 
-A nodal configuration description consists of the box layout, the upperleft corner of the puller-corral, as well as the total box pulls, the hungarian estimate of the future box pulls, and the 4 [primary] priority measures.
+A nodal configuration description consists of the box layout, the upperleft corner of the puller-corral, as well as the total box pulls, the hungarian estimate of the future box pulls, and the 5 [primary] priority measures.
 
-Conceptually, the Splaytree Priority Queue {frontier} contains 4 independent queues, each ordered by one of the 4 priority measures mentioned above. So if the round-robin parameter is K in {0,1,2,3}, we greedily pop the leading candidate node off of the front of queue #K, thereby deleting it from {frontier}.
+Conceptually, the Splaytree Priority Queue {frontier} contains 5 independent queues, each ordered by one of the 5 priority measures mentioned above. So if the round-robin parameter is K in {0,1,2,3}, we greedily pop the leading candidate node off of the front of queue #K, thereby deleting it from {frontier}.
 
 So, in this SingleStepBoxSearch the initial configuration is read, evaluated and pushed into the {frontier} queue. But goal and boxes are interchanged because this is a backward search using a "puller" rather than a "pusher".
 
@@ -172,18 +187,26 @@ Choose "K", and pop the frontrunner off Kth queue and look at its nodal informat
 
 This removed configuration is then tested to see whether a solution has been reached. If not, it is inserted into the {explored} splaytree, which has no queue structures attached. The splaytree allows rapid insertion and rapid random retrieval in case we find a solution and need to reconstruct our path. 
 
-For this current configuration we simply cycle through each [unsorted] box and try to move it one step in each direction. If the move is successful, its 4 priority measures are evaluated and it is enqueued into {frontier}. This involves a splatree insertion and 4 priority-queue insertions that each maintain a separate ordering. 
+For this current configuration we simply cycle through each [unsorted] box and try to move it one step in each direction. If the move is successful, its 5 priority measures are evaluated and it is enqueued into {frontier}. This involves a splatree insertion and 5 priority-queue insertions that each maintain a separate ordering. 
 
 End of main loop.------------------------------------------------------
 
-Addendum: after exchanging emails with Yaron Shoham, author of Festival, I have come to believe that Pri#4=NblockeBoxes is not quite "orthogonal" to Pri#3=NblockedRooms, meaning that #4 may occasionally enhance the effectiveness of #3 (and in fact, seems to). This would also imply that #4 could be omitted, as Yaron has proposed.
+Addendum1: after exchanging emails with Yaron Shoham, author of Festival, I have come to believe that Pri#4=NblockeBoxes is not quite "orthogonal" to Pri#3=NblockedRooms, meaning that #4 may occasionally enhance the effectiveness of #3 (and in fact, seems to). This would also imply that #4 could be omitted, as Yaron has proposed.
+
+Addendum2: the newly added 5th priority measure is described as follows:
+	* Nfar = 60(bmx0-bmx)/bmx0
+(the magic number 60 is the maximum numerical value allowed for priority measures 1 thru 5)
+where bmx is the sum of the squares of the box distances to their hungarian-matching goal.
+
+The desired behavior, in the forward game, is to clear out the boxes closest to their targets first, so subsequent moves have fewer obstacles. Thus, in the reverse game, we want to motivate placing the boxes furthest from their goal **before** we address the boxes relatively close to their goal.
+You might observe that there are already heuristics that drive boxes toward their goals. That is true, but they are linear in their effect. The intent here is to create a nonlinear effect that would prioritize the most distant traversals. My motivating example was problem #4 from the classic set of 90, which had been unsolved by hbox until now.
 
 
 ## What's so great about this app?
 
-This is only a moderately capable sokoban solver (solving 40 of the original 90). What makes it interesting? In a world with extremely capable solvers like Sokolution and Festival, why look at this one? Why hunt with an algorithmic crossbow instead of a gun? Simplicity & elegance. Hbox4:
+This is only a moderately capable sokoban solver (solving 45 of the original 90). What makes it interesting? In a world with extremely capable solvers like Sokolution and Festival, why look at this one? Why hunt with an algorithmic crossbow instead of a gun? Simplicity & elegance. hbox5:
 
-* contains no domain-specific specializations or strategies [other than the 4 priority measures]
+* contains no domain-specific specializations or strategies [other than the 5 priority measures]
 
 * uses algorithms and data structures of general interest and usefullness.
 
@@ -191,15 +214,15 @@ This is only a moderately capable sokoban solver (solving 40 of the original 90)
 
 * easily buildable on Windows, OSX, and Linux using free GNU Ada compiler.
 
-It also adds further proof of the effectiveness of the design choices made in the Festival solver that proposed these 4 "orthogonal" heuristic measures, or so-called "features".
+It also adds further proof of the effectiveness of the design choices made in the Festival solver that proposed the original 4 "orthogonal" heuristic measures, or so-called "features".
 
 
 ### SplayTree-Priority-Queue
-The splaytree [self-balancing-binary-tree] based priority queues allow unique hash keys to be inserted, found & removed quickly, with 4 embedded priority queues that allows efficient insertions, access, and deletion, both from the heads [popping], and directly by key. The hash keys uniquely identify pusher & box-layouts at each saved node, to avoid duplicates. The 4 priority queue orderings allow primary and secondary (tie-breaker) priority measures. As mentioned above, the structure also allows rapid, direct access deletions given the hashkey [O(log n)].
+The splaytree [self-balancing-binary-tree] based priority queues allow unique hash keys to be inserted, found & removed quickly, with 5 embedded priority queues that allows efficient insertions, access, and deletion, both from the heads [popping], and directly by key. The hash keys uniquely identify pusher & box-layouts at each saved node, to avoid duplicates. The 5 priority queue orderings allow primary and secondary (tie-breaker) priority measures. As mentioned above, the structure also allows rapid, direct access deletions given the hashkey [O(log n)].
 
 The only expensive [O(n)] operation is finding the head of each queue. That involves a lexicographical search through a 2 dimensional array of pointers to find the first non-null pointer. All other queue operations are done in constant time [O(1)], i.e. independent of the number of queue entries.
 
-It was very difficult to get these priority-queue operations to be efficient enough for use in a sokoban solver. The speed of this quadruple-queue data structure and algorithm is really quite remarkable!
+It was very difficult to get these priority-queue operations to be efficient enough for use in a sokoban solver. The speed of this quintuple-queue data structure and algorithm is really quite remarkable!
 
 ### Dynamic Programming [flood-fill]
 Dynamic programming allows efficient determination of box-valid locations and the feasibility and cost of traversing between two locations. This information is used to feed into the Hungarian Algorithm.
@@ -238,28 +261,29 @@ Currently handles only 32 boxes or less.
 
 Disclaimer #1: the elegance lies in the algorithms, not the code.
 
-Disclaimer #2: No attempt at solution optimality is made. The goal in this solver is to find any solution. The 4 orthogonal "features" do not lend themselves to finding solutions with any type of optimality.
+Disclaimer #2: No attempt at solution optimality is made. The goal in this solver is to find any solution. The 5 orthogonal "features" do not lend themselves to finding solutions with any type of optimality.
 
-Disclaimer #3: even using the option for a more efficient solution, rather than the quickest, there are strange moves produced that are clearly wasteful. Still, the solver is somewhat surprising in its capability. I have been trying for years to solve level #2 of the original 50 with the usual breadth-first search methods, but "hbox4" solves it easily. Another surprise is that it solves takaken #7 ("love") in 3 seconds, while the excellent takaken solver that I downloaded takes 27 seconds [on the same computer]. And, assuming I ran it correctly, Festival took 283 seconds!
+Disclaimer #3: even using the option for a more efficient solution, rather than the quickest, there are strange moves produced that are clearly wasteful. Still, the solver is somewhat surprising in its capability. I have been trying for years to solve level #2 of the original 50 with the usual breadth-first search methods, but "hbox5" solves it easily. Another surprise is that it solves takaken #7 ("love") in 3 seconds, while the excellent takaken solver that I downloaded takes 27 seconds [on the same computer]. And, assuming I ran it correctly, Festival took 283 seconds!
 
 In any case, I wish to expose this algorithm to public scrutiny, and allow anyone with an interest, the chance to improve or extend this generic approach to the branch of artificial intelligence that addresses the formidable task of solving sokoban puzzles.
 
 
-## Xsokoban Levels Solved (updated late 2023):
+## Xsokoban Levels Solved (updated late 2024):
 
-  1  2  3  5  6  7  8  9 12 15 
- 17 18 29 33 37 38 41 43 44 49 
- 51 53 54 56 57 58 59 60 62 64 
- 65 68 78 79 81 82 83 84 86 87
+  1  2  3  4  5  6  7  8  9 12 
+ 13 15 17 18 29 33 37 38 41 43 
+ 44 49 51 53 54 55 56 57 58 59 
+ 60 62 64 65 68 70 71 78 79 81 
+ 82 83 84 86 87
 
-for a current total count of 40 for hbox4.
+for a current total count of 45 for hbox5.
 
 Hbox1 may add some to this total, where
 hbox1 refers to the methods numbered {10,11,12,13,14,15}
 that use a single priority measure: BOG [boxes on goals]
-rather than 4.
+rather than 5.
 
-hbox4 is extravagant with memory; all failures
+hbox5 is extravagant with memory; all failures
 I have seen are due to shortage of memory, & lack of progress.
 
 
@@ -298,7 +322,7 @@ https://sourceforge.net/projects/worldcupsokerban/
 This app is covered by the GNU GPL v3 as indicated in the sources:
 
 
-Copyright (C) 2023  <fastrgv@gmail.com>
+Copyright (C) 2024  <fastrgv@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -321,7 +345,7 @@ puzzle, sokoban, solver
 ===================== update history ========================
 
 **ver 1.1.3 -- 21nov2023**
-* Revised an internal list structure; changed a LIFO stack into a FIFO queue. This means that among equal-priority configurations, the first one found is processed first. This is a more typical design, but new to hbox4. The push/move efficiency of solutions are somewhat improved (but not speed).
+* Revised an internal list structure; changed a LIFO stack into a FIFO queue. This means that among equal-priority configurations, the first one found is processed first. This is a more typical design, but new to hbox5. The push/move efficiency of solutions are somewhat improved (but not speed).
 
 **ver 1.1.2 -- 16nov2023**
 * Added an option to disable 3 of 4 priority measures (to enable a "baseline" method).
@@ -351,10 +375,10 @@ puzzle, sokoban, solver
 
 **ver 1.0.4 -- 3mar2021**
 * Simplified, yet expanded the commandline parameters. Now allow naming an output file.
-* A linux executable [hbox4] is also included.
+* A linux executable [hbox5] is also included.
 
 **ver 1.0.3 -- 18feb2021**
-* hbox4 now aborts when solution is not found after 10 minutes, to facilitate batch runs.
+* hbox5 now aborts when solution is not found after 10 minutes, to facilitate batch runs.
 
 **ver 1.0.2 -- 12feb2021**
 * Code cleanup;
@@ -367,5 +391,7 @@ puzzle, sokoban, solver
 
 **ver 1.0.0 -- 08feb2021**
 * Initial release
+
+
 
 

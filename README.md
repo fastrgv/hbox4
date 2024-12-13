@@ -22,7 +22,7 @@ Type "7z x filename.7z" to extract the archive.
 
 
 
-Alternate download link: https://sourceforge.net/projects/hbox5/
+Alternate download link: https://sourceforge.net/projects/hbox4/
 
 # hbox5 -- sokoban solver using Ada
 

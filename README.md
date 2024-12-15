@@ -22,7 +22,9 @@ Type "7z x filename.7z" to extract the archive.
 
 
 
-Alternate download link: https://sourceforge.net/projects/hbox4/
+
+Alternate download link ( "4" is not a typo ):
+	https://sourceforge.net/projects/hbox4/
 
 # hbox5 -- sokoban solver using Ada
 
@@ -36,8 +38,8 @@ Alternate download link: https://sourceforge.net/projects/hbox4/
 * Added a memory check to assure its availability: Windows, OSX, linux.
 * Enhanced portability of my linux build [by using an old compiler].
 * Delayed the endgame, thus giving more time for the full set of heuristics to be in play.
-* Added a 5th heuristic that generally improves performance; hence the name.
-* Bumped default timeout limit from 10 to 11 minutes; but, al always, (ctrl)-c quits at any time.
+* Added a 5th heuristic that generally improves performance; hence the name change.
+* Bumped default timeout limit from 10 to 11 minutes; but, as always, (ctrl)-c quits at any time.
 
 
 **ver 1.1.7 -- 2jan2024**
@@ -81,13 +83,28 @@ Featuring
 
 Pre-built executables are provided in 3 variants:
 
-	* hbox5.exe (Win64)
+	* hbox5.exe (Win64, including Windows 10 & 11)
 	* hbox5_gnu (linux)
 	* hbox5_osx (Mac/OSX)
 
 
 Note that this solver may be run from a thumb drive: Simply unzip onto a USB flash drive formatted to match your system, and run.
 
+
+## Setup
+
+Windows users please read ~/docs/windows-setup.txt for details.
+For OSX see ~/docs/osx-setup.txt. 
+Linux users can probably figure it out.
+
+But generally, you should first open a commandline terminal window.
+Then use the 7zip command to extract the archive and maintain the directory structure:
+
+	7z x <file-name>.7z [this unzips contents to a new game-dir]
+
+	cd <game-dir>
+
+Then issue the proper commandline syntax to start the app.
 
 
 
@@ -194,7 +211,9 @@ End of main loop.------------------------------------------------------
 Addendum1: after exchanging emails with Yaron Shoham, author of Festival, I have come to believe that Pri#4=NblockeBoxes is not quite "orthogonal" to Pri#3=NblockedRooms, meaning that #4 may occasionally enhance the effectiveness of #3 (and in fact, seems to). This would also imply that #4 could be omitted, as Yaron has proposed.
 
 Addendum2: the newly added 5th priority measure is described as follows:
+
 	* Nfar = 60(bmx0-bmx)/bmx0
+
 (the magic number 60 is the maximum numerical value allowed for priority measures 1 thru 5)
 where bmx is the sum of the squares of the box distances to their hungarian-matching goal.
 
@@ -299,12 +318,13 @@ Please read the details in the file "gnuAdaOnWindows.txt".
 
 ## Shameless Plug for my own Sokoban game-platforms:
 
-This solver, and 2 others, is embedded "live" in my two games (for Windows,Osx,&Linux):
+This solver, and 2 others, is embedded "live" in my three games (for Windows,Osx,&Linux):
 
 	* RufaSok (plain, with several skins)
 	* WorldCupSokerban (soccer-themed that uses "balls" shaped like the intersection of 2 cylinders)
+	* SliderPuzzles (collection of ascii, non-graphical, puzzles including sokoban)
 
-To me "live" means that the solver can be invoked at any time and it attempts to solve, not the original state, but the current state of your sokoban puzzle (whether or not it is too late). Using a keyboard key, it single steps toward a solution, but can be de-invoked at any time after it has gotten you out of a difficult situation, and you think you can complete the solution by yourself. That capability is invaluable to helping one to learn to manually solve sokoban puzzles.
+To me "live" means that the solver can be invoked at any time and it attempts to solve, not the original state, but the current state of your sokoban puzzle (whether or not it is still solvable). Using a keyboard key, it single steps toward a solution, but can be de-invoked at any time after it has gotten you out of a difficult situation, and you think you can complete the solution by yourself. That capability is invaluable to helping one to learn to manually solve sokoban puzzles.
 
 The embedded solvers are time limited. You can set the timeout, but the default is 10sec.
 
@@ -313,6 +333,8 @@ See:
 https://sourceforge.net/projects/rufassok/
 
 https://sourceforge.net/projects/worldcupsokerban/
+
+https://sourceforge.net/projects/sliderpuzzles/
 
 
 --------------------------
@@ -391,7 +413,5 @@ puzzle, sokoban, solver
 
 **ver 1.0.0 -- 08feb2021**
 * Initial release
-
-
 
 
